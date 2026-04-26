@@ -11,9 +11,8 @@
 2. [Tabla de análisis por componente](#2-tabla-de-análisis-por-componente)
 3. [Reporte de Resultados: Ejecución del ejemplo 'hola'](#3-reporte-de-resultados-ejecución-del-ejemplo-hola)
 4. [Proyecto Propio: Sistema de Monitoreo IoT](#4-proyecto-propio-sistema-de-monitoreo-iot)
-   - [Arquitectura del Sistema](#arquitectura-del-sistema)
    - [Descripción de Archivos](#descripción-de-archivos)
-   - [Explicación Detallada del Código Fuente](#explicación-detallada-del-código-fuente)
+   - [Explicación del Código Fuente](#explicación-del-código-fuente)
    - [El Makefile del Proyecto](#el-makefile-del-proyecto)
 5. [Instrucciones de Compilación y Ejecución](#5-instrucciones-de-compilación-y-ejecución)
 6. [Explicación de la Automatización](#6-explicación-de-la-automatización)
@@ -42,31 +41,13 @@ La utilidad `make` lee el archivo `Makefile` que se encuentre en el directorio a
 | **Directiva `.PHONY`** | `.PHONY: clean` | Le dice a `make` que `clean` no es un archivo real, sino una etiqueta lógica. Sin esto, si existiera un archivo llamado `clean` en el directorio, `make` pensaría que el objetivo ya está construido y no ejecutaría el comando. |
 | **Target `clean`** | `rm -f hola hola.o` | Elimina el ejecutable y los archivos objeto. La bandera `-f` en `rm` previene errores si los archivos no existen. Se invoca manualmente con `make clean`. |
 
-### Flujo de ejecución al correr `make`
 
-```
-make
-  │
-  ├─► ¿Existe el ejecutable 'hola'?
-  │     ├─ No → construir
-  │     └─ Sí → ¿Es más nuevo que 'hola.o'?
-  │               └─ Sí → no hacer nada (ya está actualizado)
-  │
-  ├─► ¿Existe 'hola.o'?
-  │     ├─ No → compilar hola.c → genera hola.o
-  │     └─ Sí → ¿Es más nuevo que 'hola.c'?
-  │               └─ Sí → no recompilar
-  │
-  └─► Enlazar hola.o → produce el ejecutable 'hola'
-```
-
-**Resultado del análisis:** Al ejecutar `make` por primera vez, el sistema compila y enlaza todo el proyecto. En ejecuciones subsecuentes, si ningún archivo `.c` fue modificado, `make` responde con `make: 'hola' is up to date` y no realiza ningún trabajo innecesario.
 
 ---
 
 ## 3. Reporte de Resultados: Ejecución del ejemplo 'hola'
 
-Durante la reproducción del ejercicio, se ejecutó el comando `make`, el cual activó la siguiente secuencia de comandos en la terminal:
+Durante la reproducción del ejercicio, se ejecutó el comando `make`, el cual activó la siguiente secuencia de comandos en la terminal con el ejemplo proporcionado por el profesor:
 
 ### Paso 1: Generación del archivo objeto
 
@@ -108,6 +89,25 @@ Para validar el funcionamiento del binario generado en este análisis:
 ```bash
 make clean
 ```
+### Flujo de ejecución al correr el ejemplo 
+
+```
+make
+  │
+  ├─► ¿Existe el ejecutable 'hola'?
+  │     ├─ No → construir
+  │     └─ Sí → ¿Es más nuevo que 'hola.o'?
+  │               └─ Sí → no hacer nada (ya está actualizado)
+  │
+  ├─► ¿Existe 'hola.o'?
+  │     ├─ No → compilar hola.c → genera hola.o
+  │     └─ Sí → ¿Es más nuevo que 'hola.c'?
+  │               └─ Sí → no recompilar
+  │
+  └─► Enlazar hola.o → produce el ejecutable 'hola'
+```
+
+**Resultado del análisis:** Al ejecutar `make` por primera vez, el sistema compila y enlaza todo el proyecto. En ejecuciones subsecuentes, si ningún archivo `.c` fue modificado, `make` responde con `make: 'hola' is up to date` y no realiza ningún trabajo innecesario.
 
 ---
 
@@ -122,12 +122,12 @@ Proyecto_IoT/
 ├── protocolo.h       ← Cabecera: define la estructura de datos compartida
 ├── sensor_nodo.c     ← Módulo: simula la lectura de sensores
 ├── gateway.c         ← Módulo: procesa y filtra los datos recibidos
-└── main.c            ← Punto de entrada: orquesta la simulación
+└── main.c            ← archivo fuente
 ```
 
 ---
 
-### Explicación Detallada del Código Fuente
+### Explicación del Código Fuente
 
 #### `protocolo.h` — La estructura de datos de comunicación
 
