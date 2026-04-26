@@ -9,14 +9,15 @@
 
 1. [¿Qué es un Makefile?](#1-qué-es-un-makefile)
 2. [Tabla de análisis por componente](#2-tabla-de-análisis-por-componente)
-3. [Proyecto Propio: Sistema de Monitoreo IoT](#3-proyecto-propio-sistema-de-monitoreo-iot)
+3. [Reporte de Resultados: Ejecución del ejemplo 'hola'](#3-reporte-de-resultados-ejecución-del-ejemplo-hola)
+4. [Proyecto Propio: Sistema de Monitoreo IoT](#4-proyecto-propio-sistema-de-monitoreo-iot)
    - [Arquitectura del Sistema](#arquitectura-del-sistema)
    - [Descripción de Archivos](#descripción-de-archivos)
    - [Explicación Detallada del Código Fuente](#explicación-detallada-del-código-fuente)
    - [El Makefile del Proyecto](#el-makefile-del-proyecto)
-4. [Instrucciones de Compilación y Ejecución](#4-instrucciones-de-compilación-y-ejecución)
-5. [Explicación de la Automatización](#5-explicación-de-la-automatización)
-6. [Requisitos del Sistema](#6-requisitos-del-sistema)
+5. [Instrucciones de Compilación y Ejecución](#5-instrucciones-de-compilación-y-ejecución)
+6. [Explicación de la Automatización](#6-explicación-de-la-automatización)
+7. [Requisitos del Sistema](#7-requisitos-del-sistema)
 
 ---
 
@@ -26,10 +27,7 @@ Un **Makefile** es un archivo de texto plano que le indica a la herramienta `mak
 
 La utilidad `make` lee el archivo `Makefile` que se encuentre en el directorio actual y ejecuta las instrucciones definidas en él. Su principal ventaja es la **compilación incremental**: `make` compara las fechas de modificación de los archivos fuente (`.c`) con sus archivos objeto (`.o`) ya generados; si el fuente no ha cambiado, no lo recompila, ahorrando tiempo en proyectos grandes.
 
-
 ---
-
-
 
 ## 2. Tabla de análisis por componente
 
@@ -66,25 +64,55 @@ make
 
 ---
 
-## 3. Proyecto Propio: Sistema de Monitoreo IoT
+## 3. Reporte de Resultados: Ejecución del ejemplo 'hola'
 
-### Arquitectura del Sistema
+Durante la reproducción del ejercicio, se ejecutó el comando `make`, el cual activó la siguiente secuencia de comandos en la terminal:
 
-Este proyecto simula un entorno de **Internet de las Cosas (IoT)** donde nodos sensores capturan datos ambientales (temperatura y humedad) y los transmiten a una pasarela central (Gateway) que los procesa y genera alertas cuando se detectan valores críticos.
+### Paso 1: Generación del archivo objeto
+
+```bash
+gcc -Wall -Wextra -O2 -c main.c -o main.o
+```
+
+- **Explicación:** El compilador traduce el código fuente `main.c` a código de máquina intermedio (`main.o`).
+- **Bandera `-O2`:** Aplica optimizaciones de código de segundo nivel para mejorar el rendimiento del ejecutable.
+- **Bandera `-c`:** Detiene el proceso antes del enlazado para generar únicamente el archivo objeto.
+
+### Paso 2: Enlazado (Linking)
+
+```bash
+gcc -Wall -Wextra -O2 main.o -o hola
+```
+
+- **Explicación:** El compilador toma los archivos objeto y las librerías necesarias para generar el archivo binario ejecutable final llamado `hola`.
+
+### Verificación de la Automatización
+
+Para comprobar la efectividad del Makefile, se ejecutó el comando `make` por segunda vez inmediatamente después de la primera compilación. El resultado obtenido fue:
 
 ```
-┌─────────────────┐        protocolo.h        ┌──────────────────┐
-│   sensor_nodo.c │  ──── Paquete binario ──►  │   gateway.c      │
-│                 │                            │                  │
-│ Simula lecturas │        (struct IoT)        │ Filtra y procesa │
-│ de temperatura  │                            │ alertas críticas │
-│ y humedad       │                            │                  │
-└─────────────────┘                            └──────────────────┘
-         ▲                                              │
-         │                                              │
-         └──────────────── main.c ─────────────────────┘
-                    (Orquestador del flujo)
+make: Nothing to be done for 'all'.
 ```
+
+Este mensaje es fundamental en la automatización, ya que confirma que el Makefile ha comparado las fechas de modificación de los archivos y ha determinado que el ejecutable `hola` ya se encuentra actualizado respecto a su código fuente, evitando así el uso innecesario de recursos del sistema.
+
+### Instrucciones de Ejecución del Ejemplo
+
+Para validar el funcionamiento del binario generado en este análisis:
+
+1. Ejecutar el programa:
+```bash
+./hola
+```
+2. Limpiar archivos temporales:
+```bash
+make clean
+```
+
+---
+
+## 4. Proyecto Propio: Sistema de Monitoreo IoT
+
 
 ### Descripción de Archivos
 
@@ -124,7 +152,9 @@ void procesar_gateway(PaqueteIoT *paquete);
 #endif // PROTOCOLO_H
 ```
 
+**¿Por qué se usa un archivo de cabecera?**
 
+Un archivo `.h` (header) centraliza las definiciones de tipos y los prototipos de funciones. Tanto `sensor_nodo.c` como `gateway.c` incluyen `protocolo.h` con `#include "protocolo.h"`, garantizando que ambos módulos trabajen con la **misma estructura de datos**. Las directivas `#ifndef / #define / #endif` son **guardas de inclusión** que evitan que el compilador procese el mismo header dos veces si es incluido desde múltiples archivos.
 
 ---
 
@@ -363,7 +393,7 @@ Se escribe una sola vez:
 
 ---
 
-## 4. Instrucciones de Compilación y Ejecución
+## 5. Instrucciones de Compilación y Ejecución
 
 ### Requisitos previos
 
@@ -437,11 +467,11 @@ Esto elimina todos los archivos generados durante la compilación (`monitor_iot`
 
 ---
 
-## 5. Explicación de la Automatización
+## 6. Explicación de la Automatización
 
 La automatización en este proyecto se logra mediante tres mecanismos combinados del Makefile:
 
-### 5.1 Detección de cambios por estampas de tiempo
+### 6.1 Detección de cambios por estampas de tiempo
 
 `make` compara automáticamente la fecha de modificación (`mtime`) de cada archivo. El flujo de decisión es:
 
@@ -460,7 +490,7 @@ La automatización en este proyecto se logra mediante tres mecanismos combinados
 
 **Ejemplo práctico:** Si se modifica únicamente `gateway.c`, `make` recompilará solo `gateway.o` y volverá a enlazar el ejecutable. Los archivos `main.o` y `sensor_nodo.o`, que no cambiaron, no se tocan.
 
-### 5.2 Reglas de patrón para escalabilidad
+### 6.2 Reglas de patrón para escalabilidad
 
 La regla `%.o: %.c` hace que el Makefile sea escalable. Si en el futuro se agrega un nuevo módulo, por ejemplo `logger.c`, solo es necesario añadir `logger.o` a la variable `OBJS`:
 
@@ -470,7 +500,7 @@ OBJS = main.o sensor_nodo.o gateway.o logger.o
 
 No hay que agregar ninguna regla de compilación adicional; la regla de patrón la cubre automáticamente.
 
-### 5.3 Gestión de dependencias del header
+### 6.3 Gestión de dependencias del header
 
 Al incluir `protocolo.h` como dependencia en la regla de patrón:
 
@@ -482,7 +512,7 @@ Al incluir `protocolo.h` como dependencia en la regla de patrón:
 
 ---
 
-## 6. Requisitos del Sistema
+## 7. Requisitos del Sistema
 
 | Requisito | Versión mínima recomendada |
 | :--- | :--- |
